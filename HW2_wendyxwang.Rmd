@@ -1,0 +1,98 @@
+---
+title: "HW2_Xiaoliang_Wang"
+author: "wendyxwang"
+date: "Tuesday, February 03, 2015"
+output: html_document
+reader: Ning Li
+---
+
+#Question 1
+1. Use the GEOmetabd package to find all HCV gene expression data using the Illumina platform submitted by an investigator at Yale. This should be done with a single query, showing the title, the GSE accession number, the GPL accession number and the manufacturer and the description of the platform used.
+
+#Answer 1:
+
+First, setting up some options
+```{r}
+library("knitr")
+opts_chunk$set(tidy=TRUE, tidy.opts=list(blank=FALSE, width.cutoff=60), cache=TRUE, messages=FALSE)
+```
+
+Download the database
+```{r, echo=FALSE}
+library(GEOmetadb)
+
+#Download the database if not downloaded yet
+if(!file.exists('GEOmetadb.sqlite')) getSQLiteFile()
+```
+
+Connect to GEO database
+```{r, echo=FALSE}
+geo_con <- dbConnect(SQLite(),"GEOmetadb.sqlite")
+dbListTables(geo_con)
+```
+
+Check gse and gpl tables
+```{r, echo=FALSE}
+dbListFields(geo_con,'gse')
+#a <- dbGetQuery(geo_con, "select * from gse limit 5")
+#a
+
+#We need title, gse, and we probably can select the Yale contributor through contact?
+
+dbListFields(geo_con,'gpl')
+#b <- dbGetQuery(geo_con, "select * from gpl limit 5")
+#b
+
+#We need title (jointly match with gse.title), gpl, manufacturer(Illumina),contact(like %yale% ?), and description
+
+```
+
+To find all HCV gene expression data using the Illumina platform submitted by an investigator at Yale
+```{r, echo=FALSE}
+hcv_all <- dbGetQuery(geo_con, paste("select gse.title as title, gse.gse as gse,", "gpl.gpl as gpl, gpl.manufacturer as manufacturer, gpl.description as description", "from (gse join gse_gpl on gse.gse=gse_gpl.gse) j join gpl on j.gpl=gpl.gpl", "where gse.title like '%HCV%'", "and gpl.manufacturer like '%Illumina%'", "and gse.contact like '%Yale%'"))
+```
+
+Present the results here
+```{r}
+head(hcv_all)
+#And there are only two arrays.
+```
+
+#Question 2:
+2. Reproduce your above query using the data.table package. Again, try to use a single line of code. [Hint: You first need to convert all db tables to data.table tables].
+
+#Answer 2:
+First, set up the package
+```{r, echo=FALSE}
+library(data.table)
+```
+
+Convert all db tables needed to data.table
+```{r, echo=FALSE}
+dt_gse <- data.table(dbGetQuery(geo_con, "select * from gse"))
+dt_gse_gpl <- data.table(dbGetQuery(geo_con, "select * from gse_gpl"))
+dt_gpl <- data.table(dbGetQuery(geo_con, "select * from gpl"))
+```
+
+set key ?
+
+
+Please submit your code as an Rmd file that can be used to check your queries and show the results. You need to make sure you ignore all output files. For consistency, please name your repository HW2-yourusername. Look at other instructions on Canvas.
+
+Remember to comment your code as much as possible and use good coding standards. 
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+summary(cars)
+```
+
+You can also embed plots, for example:
+
+```{r, echo=FALSE}
+plot(cars)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
