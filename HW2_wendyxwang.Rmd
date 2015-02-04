@@ -47,6 +47,9 @@ dbListFields(geo_con,'gpl')
 #b <- dbGetQuery(geo_con, "select * from gpl limit 5")
 #b
 #We need title (jointly match with gse.title), gpl, manufacturer(Illumina),contact(like %yale% ), and description
+
+#We need title (jointly match with gse.title), gpl, manufacturer(Illumina),contact(like %yale% ), and description
+
 ```
 
 To find all HCV gene expression data using the Illumina platform submitted by an investigator at Yale
