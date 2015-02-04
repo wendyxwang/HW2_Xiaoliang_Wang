@@ -43,7 +43,7 @@ dbListFields(geo_con,'gpl')
 #b <- dbGetQuery(geo_con, "select * from gpl limit 5")
 #b
 
-#We need title (jointly match with gse.title), gpl, manufacturer(Illumina),contact(like %yale% ?), and description
+#We need title (jointly match with gse.title), gpl, manufacturer(Illumina),contact(like %yale% ), and description
 
 ```
 
@@ -69,13 +69,24 @@ library(data.table)
 
 Convert all db tables needed to data.table
 ```{r, echo=FALSE}
-dt_gse <- data.table(dbGetQuery(geo_con, "select * from gse"))
-dt_gse_gpl <- data.table(dbGetQuery(geo_con, "select * from gse_gpl"))
-dt_gpl <- data.table(dbGetQuery(geo_con, "select * from gpl"))
+dt1 <- data.table(dbGetQuery(geo_con, "select * from gse join gse_gpl on gse.gse=gse_gpl.gse"))
+dt2 <- data.table(dbGetQuery(geo_con, "select * from gpl"))
 ```
 
-set key ?
+set keys
+```{r, echo=FALSE}
+setkey(dt1, gpl)
+setkey(dt2, gpl)
 
+j <- dt1[dt2, nomatch=0]
+```
+
+Replicate the query using data.table in one line
+```{r, echo=FALSE}
+hcv <- j[title %like% 'HCV' & manufacturer %like% 'Illumina' & contact %like% 'Yale',]
+hcv <- j[title %like% 'HCV' & manufacturer %like% 'Illumina' & contact %like% 'Yale', ]
+```
+list(title, gse, gpl, manufacturer, description)
 
 Please submit your code as an Rmd file that can be used to check your queries and show the results. You need to make sure you ignore all output files. For consistency, please name your repository HW2-yourusername. Look at other instructions on Canvas.
 
