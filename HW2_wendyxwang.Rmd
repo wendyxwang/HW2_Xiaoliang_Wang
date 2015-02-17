@@ -23,7 +23,7 @@ opts_chunk$set(tidy=TRUE, tidy.opts=list(blank=FALSE, width.cutoff=60), cache=TR
 ```
 
 Download the database
-```{r,eval=FALSE}
+```{r, eval=FALSE}
 library(GEOmetadb)
 #Download the database if not downloaded yet
 if(!file.exists('GEOmetadb.sqlite')) getSQLiteFile()
